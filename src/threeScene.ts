@@ -1,5 +1,7 @@
-import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+
+import { loadTextures, loadModels } from "./managers/assetManager";
 
 export const initThreeScene = (container: HTMLDivElement) => {
   // Setup scene
@@ -27,19 +29,25 @@ export const initThreeScene = (container: HTMLDivElement) => {
 
   // Create a blue cube
   const geometry = new THREE.BoxGeometry(2, 2, 2);
-  const material = new THREE.MeshStandardMaterial({ 
+  const material = new THREE.MeshStandardMaterial({
     color: 0x0066ff,
   });
   const cube = new THREE.Mesh(geometry, material);
+  cube.position.set(2, 0, 0);
   scene.add(cube);
 
   // Add lights
-  const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+  const ambientLight = new THREE.AmbientLight(0xffffff, 5);
+  ambientLight.position.set(0, 5, 0);
   scene.add(ambientLight);
 
-  const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-  directionalLight.position.set(5, 5, 5);
+  const directionalLight = new THREE.DirectionalLight(0xffffff, 10);
+  directionalLight.position.set(0, 25, 5);
   scene.add(directionalLight);
+
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  directionalLight.castShadow = true;
 
   // Handle window resize
   const handleResize = () => {
@@ -47,22 +55,40 @@ export const initThreeScene = (container: HTMLDivElement) => {
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
   };
-  window.addEventListener('resize', handleResize);
+  window.addEventListener("resize", handleResize);
+
+  // Initialize scene with proper async loading sequence
+  const initAssetLoad = async () => {
+    try {
+      // First load textures and await the result
+      const textures = await loadTextures(
+        "./assets/textures/UV_checker_Map.jpg"
+      );
+
+      // Then load models with the loaded textures
+      await loadModels("./assets/models/glassyCube.glb", scene, textures);
+    } catch (error) {
+      console.error("Error initializing scene:", error);
+    }
+  };
+
+  // Start the initialization process
+  initAssetLoad();
 
   // Animation loop
   const animate = () => {
     requestAnimationFrame(animate);
-    
+
     // Update controls
     controls.update();
-    
+
     renderer.render(scene, camera);
   };
   animate();
 
   // Return cleanup function
   return () => {
-    window.removeEventListener('resize', handleResize);
+    window.removeEventListener("resize", handleResize);
     if (container.contains(renderer.domElement)) {
       container.removeChild(renderer.domElement);
     }
@@ -71,4 +97,4 @@ export const initThreeScene = (container: HTMLDivElement) => {
     renderer.dispose();
     controls.dispose();
   };
-}
+};

@@ -1,50 +1,115 @@
-# React + TypeScript + Vite
+# Three.js TypeScript Starter
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern starter template for building 3D web applications using Three.js, React, TypeScript, and Vite. This project provides a solid foundation for creating interactive 3D experiences with a clean development workflow.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Three.js Integration** - Ready-to-use 3D rendering engine setup
+- **Asset Management** - Built-in utilities for loading textures and 3D models
+- **TypeScript Support** - Full type safety and modern JavaScript features
+- **React Components** - Component-based structure for UI elements
+- **Fast Development** - Powered by Vite for quick HMR (Hot Module Replacement)
+- **Responsive Design** - Automatically adjusts to window resizing
+- **Code Quality** - ESLint configuration for maintaining clean code
 
-## Expanding the ESLint configuration
+## Prerequisites
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- Node.js (v16 or higher)
+- npm or yarn
 
-- Configure the top-level `parserOptions` property like this:
+## Getting Started
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+1. Clone this repository
+
+```bash
+git clone https://github.com/your-username/three-js-ts-starter.git
+cd three-js-ts-starter
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+2. Install dependencies
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+```bash
+npm install
+# or
+yarn
 ```
+
+3. Start the development server
+
+```bash
+npm run dev
+# or
+yarn dev
+```
+
+4. Open your browser and navigate to `http://localhost:5173`
+
+## Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Type check and build for production
+- `npm run lint` - Run ESLint
+- `npm run preview` - Preview production build
+
+## Project Structure
+
+```
+three-js-ts-starter/
+├── public/                  # Static assets
+│   └── assets/              # 3D models, textures, etc.
+├── src/                     # Source code
+│   ├── managers/            # Service managers (assetManager, etc.)
+│   ├── exported_gltfs/      # GLTF models
+│   ├── App.tsx              # Main React component
+│   ├── threeScene.ts        # Three.js scene setup
+│   └── main.tsx             # Entry point
+├── .gitignore               # Git ignore file
+├── eslint.config.js         # ESLint configuration
+├── index.html               # HTML entry point
+├── package.json             # Dependencies and scripts
+├── tsconfig.json            # TypeScript configuration
+└── vite.config.ts           # Vite configuration
+```
+
+## Key Components
+
+### `threeScene.ts`
+
+Sets up the Three.js scene, camera, renderer, lights, and animation loop.
+
+### `managers/assetManager.ts`
+
+Handles loading of textures and 3D models with proper async patterns.
+
+### `App.tsx`
+
+Main React component that initializes and contains the Three.js canvas.
+
+## Customizing the Scene
+
+The project comes with a basic 3D scene including:
+
+- A blue cube (created in code)
+- Asset loading for GLTF models
+- Orbit controls for camera manipulation
+- Proper lighting setup
+- Window resize handling
+
+To customize the scene, modify the `threeScene.ts` file and adjust the camera, lighting, geometries, materials, and animation logic as needed.
+
+## Code Style Guidelines
+
+- **TypeScript**: Use strict mode, explicit return types on functions
+- **Imports**: Group imports (React, third-party, internal)
+- **Formatting**: Use consistent indentation (2 spaces)
+- **Components**: Use functional components with React hooks
+- **Error Handling**: Use try/catch blocks for async operations
+- **Types**: Avoid `any` type except for prototyping
+
+## License
+
+[MIT](LICENSE)
+
+## Contributing
+
+Contributions are welcome! Feel free to open issues or submit pull requests.

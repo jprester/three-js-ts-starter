@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 
-import { loadTextures, loadModels } from "./managers/assetManager";
+import { loadTexture, loadModel } from "./managers/assetManager";
 
 export const initThreeScene = (container: HTMLDivElement) => {
   // Setup scene
@@ -61,12 +61,16 @@ export const initThreeScene = (container: HTMLDivElement) => {
   const initAssetLoad = async () => {
     try {
       // First load textures and await the result
-      const textures = await loadTextures(
-        "./assets/textures/UV_checker_Map.jpg"
-      );
+      const textures = await loadTexture({
+        diffuseMapUrl: "./assets/textures/UV_checker_Map.jpg",
+      });
 
       // Then load models with the loaded textures
-      await loadModels("./assets/models/glassyCube.glb", scene, textures);
+      await loadModel("./assets/models/glassyCube.glb", scene, textures, {
+        position: { x: 0, y: 0, z: 0 },
+        scale: { x: 1, y: 1, z: 1 },
+        rotation: { x: 0, y: 0, z: 0 },
+      });
     } catch (error) {
       console.error("Error initializing scene:", error);
     }

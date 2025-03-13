@@ -3,65 +3,120 @@ import { GLTFLoader } from "three/examples/jsm/Addons.js";
 
 const textureLoader = new THREE.TextureLoader();
 
-export const loadTextures = async (textureUrl: string) => {
+export const loadTexture = async ({
+  diffuseMapUrl,
+  emissionMapUrl,
+}: {
+  diffuseMapUrl?: string;
+  emissionMapUrl?: string;
+}) => {
   try {
     console.log("Loading textures...");
+    if (!diffuseMapUrl) {
+      console.warn("Missing texture URLs");
+      return;
+    }
 
     // Load textures
-    const diffuseMap = textureLoader.load(textureUrl);
+    const diffuseMap = textureLoader.load(diffuseMapUrl);
+    diffuseMap.flipY = false; // GLTF expects unflipped textures
+    diffuseMap.needsUpdate = true;
+    console.log("Diffuse texture loaded successfully! ", diffuseMap);
 
-    console.log("Textures loaded successfully! ", diffuseMap);
+    if (!emissionMapUrl) {
+      console.warn("Missing emission map URL");
+      return { diffuseMap };
+    }
+    const emissiveMap = textureLoader.load(emissionMapUrl);
+    emissiveMap.flipY = false; // GLTF expects unflipped textures
+    emissiveMap.needsUpdate = true;
 
-    return { diffuseMap };
+    console.log("Emissive texture loaded successfully! ", emissiveMap);
+
+    // diffuseMap.repeat.set(4, 4);
+
+    return { diffuseMap, emissiveMap };
   } catch (error) {
     console.error("Error loading textures:", error);
   }
 };
 
-export const loadModels = async (
+export const loadModel = async (
   modelUrl: string,
   scene: THREE.Scene,
   textures?: {
     diffuseMap?: THREE.Texture;
-    normalMap?: THREE.Texture;
+    emissiveMap?: THREE.Texture;
+  },
+  options?: {
+    position?: { x: number; y: number; z: number };
+    scale?: { x: number; y: number; z: number };
+    rotation?: { x: number; y: number; z: number };
   }
 ) => {
   try {
     console.log("Initializing city scene...");
-    const { diffuseMap } = textures || {};
+    const { diffuseMap, emissiveMap } = textures || {};
 
     const gltfLoader = new GLTFLoader();
+    // const objLoader = new OBJLoader();
 
     // Loading a GLB with embedded textures
-    gltfLoader.load(
-      modelUrl,
-      (gltf) => {
-        console.log("Model loaded successfully! ", gltf);
-        const model = gltf.scene;
-        // Traverse the model to apply texture to all meshes
-        model.traverse((child) => {
-          if (child instanceof THREE.Mesh) {
-            console.log("diffuseMap: ", diffuseMap);
-            // Create a new material with the diffuse texture
-            const material = new THREE.MeshStandardMaterial({
-              map: diffuseMap, // Diffuse texture
-              metalness: 0.8, // Adjust as needed
-              roughness: 0.5, // Adjust as needed
-            });
+    // Load OBJ model
 
-            // Apply the new material
-            child.material = material;
-          }
-        });
+    gltfLoader.load(
+      modelUrl, // Replace with your OBJ file path
+      (mesh) => {
+        const model = mesh.scene;
+        // Traverse the object to apply material
+        if (diffuseMap) {
+          model.traverse((child) => {
+            if (child instanceof THREE.Mesh) {
+              const material = new THREE.MeshStandardMaterial(
+                emissiveMap
+                  ? {
+                      map: diffuseMap, // Diffuse texture
+                      metalness: 1, // Adjust as needed
+                      roughness: 1, // Adjust as needed
+                      emissive: new THREE.Color(0xffffff), // Emissive color (white default)
+                      emissiveMap: emissiveMap, // Emission texture
+                      emissiveIntensity: 1.4, // Strength of emission
+                    }
+                  : {
+                      map: diffuseMap, // Diffuse texture
+                      metalness: 1, // Adjust as needed
+                      roughness: 1, // Adjust as needed
+                    }
+              );
+              child.material = material;
+            }
+          });
+        }
+
+        model.position.set(
+          options?.position?.x || 0,
+          options?.position?.y || 0,
+          options?.position?.z || 0
+        );
+        model.scale.set(
+          options?.scale?.x || 1,
+          options?.scale?.y || 1,
+          options?.scale?.z || 1
+        );
+        model.rotation.set(
+          options?.rotation?.x || 0,
+          options?.rotation?.y || 0,
+          options?.rotation?.z || 0
+        );
 
         scene.add(model);
-        scene.add(gltf.scene);
       },
       (xhr) => {
-        console.log(`${(xhr.loaded / xhr.total) * 100}% loaded`);
+        // Loading progress
+        console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
       },
       (error) => {
-        console.error("Error loading model:", error);
+        console.error("An error occurred:", error);
       }
     );
   } catch (error) {

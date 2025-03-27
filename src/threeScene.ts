@@ -575,10 +575,10 @@ export const initThreeScene = (container: HTMLDivElement) => {
         let rotation: THREE.Euler;
         let position: THREE.Vector3;
         const buildingWidth = (
-          building.children[0].geometry as THREE.BoxGeometry
+          (building.children[0] as THREE.Mesh).geometry as THREE.BoxGeometry
         ).parameters.width;
         const buildingDepth = (
-          building.children[0].geometry as THREE.BoxGeometry
+          (building.children[0] as THREE.Mesh).geometry as THREE.BoxGeometry
         ).parameters.depth;
 
         switch (side) {
